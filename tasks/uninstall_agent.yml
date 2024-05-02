@@ -1,9 +1,16 @@
 ---
+- name: Check if Elastic Agent is uninstalled
+  ansible.builtin.stat:
+    path: /usr/bin/elastic-agent
+  register: stat_result
 - name: Uninstall Elastic Agent
   ansible.builtin.command: >
       /usr/bin/elastic-agent uninstall
       --force
       {{ uninstall_token_option }}
   vars:
-    uninstall_token_option: "{{ '--uninstall-token {{ elastic_agent_uninstall_token }}' if elastic_agent_uninstall_token | length > 0 else '' }}"
-  ignore_errors: true
+    uninstall_token_option: "{{ '--uninstall-token {{ elastic_agent_uninstall_token }}'
+      if elastic_agent_uninstall_token | length > 0 else '' }}"
+  failed_when: false
+  changed_when: true
+  when: stat_result.stat.exists

@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Playbook to test role
+  hosts: all
   become: true
   roles:
     - ansible-role-elastic-agent

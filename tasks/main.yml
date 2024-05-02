@@ -1,12 +1,12 @@
 ---
 - name: Prepare Elastic agent files
-  import_tasks: get_files.yml
+  ansible.builtin.import_tasks: get_files.yml
 
 - name: Enroll Elastic Agent
-  import_tasks: enroll_agent.yml
+  ansible.builtin.import_tasks: enroll_agent.yml
 
 - name: Uninstall Elastic Agent
-  import_tasks: uninstall_agent.yml
+  ansible.builtin.import_tasks: uninstall_agent.yml
   tags:
-  - never
-  - wipe_elastic_agent
+    - never
+    - wipe_elastic_agent

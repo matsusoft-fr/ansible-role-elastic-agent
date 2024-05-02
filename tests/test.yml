@@ -3,4 +3,4 @@
   hosts: all
   become: true
   roles:
-    - ansible-role-elastic-agent
+    - elastic_agent

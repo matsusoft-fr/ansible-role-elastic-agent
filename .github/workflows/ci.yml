@@ -24,6 +24,11 @@ jobs:
       - name: Run yamllint
         uses: karancode/yamllint-github-action@v2.1.1
 
+      - name: To help ansible-lint to find elastic_agent role
+        run: |
+          mkdir -p ~/.ansible/roles
+          ln -s . ~/.ansible/roles/elastic_agent
+
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v24.2.2
 

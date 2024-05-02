@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: elastic_agent
   author: jpmat296
   description: Elastic Agent / Fleet Server for Linux / macOS
 

@@ -1,0 +1,55 @@
+---
+name: CI
+'on':
+  pull_request:
+  push:
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint
+
+      - name: Run yamllint
+        uses: karancode/yamllint-github-action@v2.1.1
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v24.2.2
+
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - generic/rocky9
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      # - name: Set up Python 3.
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.x'
+
+      # - name: Install test dependencies.
+      #   run: pip3 install ansible molecule molecule-plugins[vagrant] python-vagrant passlib
+
+      - name: Run Molecule tests.
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}

@@ -1,0 +1,9 @@
+---
+- name: Uninstall Elastic Agent
+  ansible.builtin.command: >
+      /usr/bin/elastic-agent uninstall
+      --force
+      {{ uninstall_token_option }}
+  vars:
+    uninstall_token_option: "{{ '--uninstall-token {{ elastic_agent_uninstall_token }}' if elastic_agent_uninstall_token | length > 0 else '' }}"
+  ignore_errors: true

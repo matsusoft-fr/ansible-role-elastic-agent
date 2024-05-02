@@ -1,2 +1,6 @@
-localhost
+[hosts]
+localvm1
 
+[all:vars]
+elastic_agent_enrollment_fleet_server_url=https://localvm4:8220
+elastic_agent_download_filename=elastic-agent-{{ elastic_agent_version }}-{{ ansible_system | lower }}-arm64.tar.gz

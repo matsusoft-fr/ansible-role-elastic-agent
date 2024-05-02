@@ -1,0 +1,23 @@
+---
+- name: Check if process elastic-agent exists already
+  community.general.pids:
+    name: elastic-agent
+  register: pids_of_ea
+- name: Configure Elastic Agent
+  ansible.builtin.command: >
+    {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      --force
+      {{ non_interactive_option }}
+      --insecure
+      --url={{ elastic_agent_enrollment_fleet_server_url }}
+      --enrollment-token={{ elastic_agent_enrollment_token }}
+  become: true
+  become_user: root
+  vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+  no_log: true
+  when: pids_of_ea.pids | length == 0
+- name: Delete tmp installation dir of Elastic Agent
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}"
+    state: absent

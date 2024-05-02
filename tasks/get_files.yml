@@ -1,0 +1,33 @@
+---
+- name: Create tmp installation dir for Elastic Agent
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}"
+    state: directory
+    owner: "{{ elastic_agent_user }}"
+    group: "{{ elastic_agent_group }}"
+    mode: 0750
+- name: Check if Elastic Agent files are already here
+  ansible.builtin.stat:
+    path: "{{ elastic_agent_installation_tmpdir }}/LICENSE.txt"
+  register: stat_result
+- name: Download Elastic Agent tarball
+  ansible.builtin.get_url:
+    url: "{{ elastic_agent_download_url }}"
+    dest: "{{ elastic_agent_installation_tmpdir }}/{{ elastic_agent_download_filename }}"
+    owner: "{{ elastic_agent_user }}"
+    group: "{{ elastic_agent_group }}"
+  when: not stat_result.stat.exists
+- name: Untar Elastic Agent tarball
+  ansible.builtin.shell:
+    cmd: >
+      tar xzf {{ elastic_agent_download_filename }}
+      --strip-components=1
+      -C '{{ elastic_agent_installation_tmpdir }}'
+    chdir: '{{ elastic_agent_installation_tmpdir }}'
+    creates: "{{ elastic_agent_installation_tmpdir }}/LICENSE.txt"
+  become: true
+  become_user: "{{ elastic_agent_user }}"
+- name: Delete Elastic Agent tarball
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}/{{ elastic_agent_download_filename }}"
+    state: absent

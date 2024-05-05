@@ -1,0 +1,55 @@
+---
+# sa_configuration.yml : Configure standalone Elastic Agent
+- name: Check if api key parameter is defined
+  ansible.builtin.fail:
+    msg: >
+      Ansible variable 'elastic_agent_standalone_api_key' is not defined. It is required for
+      standalone Elastic Agent. Operation cannot continue.
+  when: elastic_agent_standalone_api_key | length == 0
+
+# elastic-agent.yml in source installation dir is used only the first time by the 'install' command.
+# After elastic-agent.yml in target installation dir is used by Elatic Agent.
+# To simplify, both files are always changed to be sure a change is taken account.
+- name: Check if elastic-agent.yml.j2 file exists (source install dir)
+  ansible.builtin.stat:
+    path: "{{ elastic_agent_installation_tmpdir }}/elastic-agent.yml"
+  register: stat_result_source
+- name: Prepare elastic-agent.yml.j2 for Elastic Agent (source install dir)
+  ansible.builtin.template:
+    src: templates/elastic-agent.yml.j2
+    dest: "{{ elastic_agent_installation_tmpdir }}/elastic-agent.yml"
+    owner: "{{ elastic_agent_user }}"
+    group: "{{ elastic_agent_group }}"
+    mode: 0600
+  when: stat_result_source.stat.exists
+- name: Check if elastic-agent.yml.j2 file exists (target install dir)
+  ansible.builtin.stat:
+    path: "{{ elastic_agent_installation_dir }}/elastic-agent.yml"
+  register: stat_result_target
+- name: Prepare elastic-agent.yml.j2 for Elastic Agent (target install dir)
+  ansible.builtin.template:
+    src: templates/elastic-agent.yml.j2
+    dest: "{{ elastic_agent_installation_dir }}/elastic-agent.yml"
+    owner: "{{ elastic_agent_user }}"
+    group: "{{ elastic_agent_group }}"
+    mode: 0600
+  when: stat_result_target.stat.exists
+  notify:
+    - Restart Elastic Agent
+- name: Install Elastic Agent as standalone
+  ansible.builtin.command: >
+    {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      --force
+      {{ non_interactive_option }}
+      --insecure
+  become: true
+  become_user: root
+  vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+  no_log: true
+  changed_when: true
+  when: not stat_result_target.stat.exists
+- name: Ensure Elastic Agent is started
+  ansible.builtin.systemd_service:
+    state: started
+    name: elastic-agent

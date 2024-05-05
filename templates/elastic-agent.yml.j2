@@ -1,0 +1,37 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts:
+{% for url in elastic_agent_standalone_elasticsearch_urls %}
+      - {{ url }}
+{% endfor %}
+{% if elastic_agent_ssl_certificate_authorities | length > 0 %}
+    ssl.certificate_authorities:
+{% for path in elastic_agent_ssl_certificate_authorities %}
+      - {{ path }}
+{% endfor %}
+{%endif %}
+{% if elastic_agent_ssl_verification_mode | length > 0 %}
+    ssl.verification_mode: {{ elastic_agent_ssl_verification_mode }}
+{%endif %}
+    api_key: "{{ elastic_agent_standalone_api_key }}"
+    preset: balanced
+
+inputs:
+  - type: system/metrics
+    id: system-metrics
+    data_stream.namespace: default
+    use_output: default
+    streams:
+      - metricsets:
+        - cpu
+        data_stream.dataset: system.cpu
+      - metricsets:
+        - memory
+        data_stream.dataset: system.memory
+      - metricsets:
+        - network
+        data_stream.dataset: system.network
+      - metricsets:
+        - filesystem
+        data_stream.dataset: system.filesystem

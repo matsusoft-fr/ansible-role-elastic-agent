@@ -1,0 +1,42 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Wait 200 secs for Elastic Agent warmup
+      ansible.builtin.pause:
+        seconds: 200
+    - name: _count API to get number of docs in last 5 minutes
+      ansible.builtin.uri:
+        method: GET
+        url: "https://localhost:9200/metrics-*/_count"
+        body: '
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-5m"
+            }
+          }
+        },
+        {
+          "term": {
+            "host.hostname": "{{ elastic_agent_verification_hostname }}"
+          }
+        }
+      ]
+    }
+  }
+}'
+        body_format: json
+        url_username: elastic
+        url_password: change_me
+        validate_certs: false
+      delegate_to: localhost
+      register: count_result
+    - name: Assert Elastic Agent has sent some docs
+      ansible.builtin.assert:
+        that: count_result.json.count > 0

@@ -3,4 +3,4 @@
   hosts: all
   become: true
   roles:
-    - elastic_agent
+    - jpmat296.elastic_agent

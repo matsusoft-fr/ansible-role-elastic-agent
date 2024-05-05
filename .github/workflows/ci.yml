@@ -24,11 +24,6 @@ jobs:
       - name: Run yamllint
         uses: karancode/yamllint-github-action@v2.1.1
 
-      - name: To help ansible-lint to find elastic_agent role
-        run: |
-          mkdir -p ~/.ansible/roles
-          ln -s . ~/.ansible/roles/elastic_agent
-
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v24.2.2
 
@@ -44,8 +39,13 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
 
+      - name: Start containers
+        run: |
+          cd molecule/default/setup
+          docker-compose up -d
+
       - name: Install test dependencies.
-        run: pip3 install ansible molecule
+        run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
         run: molecule test
@@ -53,3 +53,9 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: Stop containers
+        if: always()
+        run: |
+          cd molecule/default/setup
+          docker-compose down || true

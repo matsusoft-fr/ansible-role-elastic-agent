@@ -1,0 +1,31 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: Create new API key from Elasticsearch
+      ansible.builtin.uri:
+        method: PUT
+        url: "https://localhost:9200/_security/api_key"
+        body:
+          name: molecule-automatic-test-{{ lookup('ansible.builtin.env', 'MOLECULE_SCENARIO_NAME') }}
+          expiration: 1h
+        body_format: json
+        url_username: elastic
+        url_password: change_me
+        validate_certs: false
+      delegate_to: localhost
+      register: api_key_result
+    - name: Create a directory /tmp/molecule if it does not exist
+      ansible.builtin.file:
+        path: /tmp/molecule
+        state: directory
+        mode: 0700
+      delegate_to: localhost
+    - name: Save api key in tmp file
+      ansible.builtin.copy:
+        content: "{{ api_key_result.json.encoded | b64decode }}"
+        dest: "/tmp/molecule/api_key_molecule-automatic-test-{{ lookup('ansible.builtin.env',
+          'MOLECULE_SCENARIO_NAME') }}"
+        mode: 0700
+      delegate_to: localhost

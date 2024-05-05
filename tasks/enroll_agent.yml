@@ -3,7 +3,7 @@
   community.general.pids:
     name: elastic-agent
   register: pids_of_ea
-- name: Configure Elastic Agent
+- name: Install Elastic Agent managed by Fleet
   ansible.builtin.command: >
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install
       --force

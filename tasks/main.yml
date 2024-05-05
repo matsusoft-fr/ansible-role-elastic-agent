@@ -2,8 +2,13 @@
 - name: Prepare Elastic agent files
   ansible.builtin.import_tasks: get_files.yml
 
-- name: Enroll Elastic Agent
+- name: Install + Enroll Elastic Agent
   ansible.builtin.import_tasks: enroll_agent.yml
+  when: elastic_agent_enrollment_fleet_server_url | length > 0
+
+- name: Install Elastic Agent standalone
+  ansible.builtin.import_tasks: sa_configuration.yml
+  when: elastic_agent_standalone_elasticsearch_urls | length > 0
 
 - name: Uninstall Elastic Agent
   ansible.builtin.import_tasks: uninstall_agent.yml

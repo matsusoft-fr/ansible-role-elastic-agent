@@ -1,0 +1,17 @@
+---
+- name: Cleanup
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Clean api key
+      ansible.builtin.uri:
+        method: DELETE
+        url: "https://localhost:9200/_security/api_key"
+        body:
+          name: molecule-automatic-test-{{ lookup('ansible.builtin.env', 'MOLECULE_SCENARIO_NAME') }}
+        body_format: json
+        url_username: elastic
+        url_password: change_me
+        validate_certs: false
+      delegate_to: localhost

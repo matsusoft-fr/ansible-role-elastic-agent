@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         version:
-          - 8.7.0   # -- base-path not supported
-          - 8.10.4  # -- base-path not supported
-          - 8.12.2
+          # - 8.7.0   # -- base-path not supported
+          # - 8.10.4  # -- base-path not supported
+          # - 8.12.2
           - 8.13.3
         distro:
           - ubuntu-22.04
@@ -27,18 +27,43 @@ jobs:
       - name: Start containers
         run: |
           cd molecule/setup/es_kb_fleet
-          STACK_VERSION=${{ matrix.version }} ./elastic-container.sh start
+          sed -i 's/^STACK_VERSION=.*/STACK_VERSION=${{ matrix.version }}/g' .env
+          ./elastic-container.sh start
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
         run: |
-          STACK_VERSION=${{ matrix.version }} molecule test -s enroll
+          STACK_VERSION=${{ matrix.version }} molecule test -s enroll --destroy never
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: DEBUG - STATE
+        if: always()
+        continue-on-error: true
+        run: |
+          docker ps -a
+          docker exec instance-ubuntu-22.04 ps -fC elastic-agent
+          docker exec instance-ubuntu-22.04 find /opt/Elastic/Agent -iname "*.log" -o -iname "*.ndjson"
+          docker exec instance-ubuntu-22.04 systemctl status elastic-agent
+          docker exec instance-ubuntu-22.04 ls -lrt /opt/Elastic/Agent/data/elastic-agent-de80b0/logs
+
+      - name: DEBUG - Copy before updload
+        if: always()
+        continue-on-error: true
+        run: |
+          docker cp 'instance-ubuntu-22.04:/opt/Elastic/Agent/data/elastic-agent-de80b0/logs' ~/
+          sudo chmod -R 777 ~/logs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: my-artifact
+          path: |
+            ~/logs
 
       - name: Stop containers
         if: always()

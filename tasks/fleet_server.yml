@@ -63,7 +63,7 @@
       --fleet-server-port=8220
       {{ fleet_server_es_ca_option }}
       {{ fleet_server_insecure_option }}
-  no_log: true
+  no_log: false
   vars:
     fleet_server_es_ca_option: "{{ '--fleet-server-es-ca ' +
       elastic_agent_ssl_certificate_authorities[0]

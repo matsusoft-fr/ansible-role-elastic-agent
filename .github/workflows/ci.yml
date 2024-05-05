@@ -39,6 +39,11 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
 
+      - name: DEBUG - BEFORE
+        run: |
+          hostname
+          export
+
       - name: Start containers
         run: |
           cd molecule/default/setup
@@ -48,11 +53,33 @@ jobs:
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
-        run: molecule test
+        run: molecule test --destroy never
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: DEBUG - STATE
+        if: always()
+        run: |
+          docker ps -all
+          docker exec instance-ubuntu ps -fC elastic-agent
+          docker exec instance-ubuntu find /opt/Elastic/Agent -iname "*.log" -o -iname "*.ndjson"
+          docker exec instance-ubuntu systemctl status elastic-agent
+          docker exec instance-ubuntu ls -lrt /opt/Elastic/Agent/data/elastic-agent-de80b0/logs
+
+      - name: DEBUG - Copy before updload
+        if: always()
+        run: |
+          docker cp 'instance-ubuntu:/opt/Elastic/Agent/data/elastic-agent-de80b0/logs' ~/
+          sudo chmod -R 777 ~/logs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: my-artifact
+          path: |
+            ~/logs
 
       - name: Stop containers
         if: always()

@@ -37,6 +37,35 @@
         validate_certs: false
       delegate_to: localhost
       register: count_result
+    - name: _count (2)
+      ansible.builtin.uri:
+        method: GET
+        url: "https://localhost:9200/metrics-*/_count"
+        body: '
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-5m"
+            }
+          }
+        }
+      ]
+    }
+  }
+}'
+        body_format: json
+        url_username: elastic
+        url_password: change_me
+        validate_certs: false
+      delegate_to: localhost
+      register: count_result2
+    - name: DEBUG
+      ansible.builtin.debug:
+        var: count_result2.json.count
     - name: Assert Elastic Agent has sent some docs
       ansible.builtin.assert:
         that: count_result.json.count > 0

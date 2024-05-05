@@ -46,7 +46,7 @@
   become_user: root
   vars:
     non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
-  no_log: true
+  # no_log: true
   changed_when: true
   when: not stat_result_target.stat.exists
 - name: Ensure Elastic Agent is started

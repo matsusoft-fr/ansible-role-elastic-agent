@@ -32,8 +32,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        version:
+          - 8.7.0
+          - 8.12.2
+          - 8.13.3
         distro:
-          - generic/rocky9
+          - ubuntu-22.04
+          - rockylinux-9
 
     steps:
       - name: Check out the codebase.
@@ -42,13 +47,13 @@ jobs:
       - name: Start containers
         run: |
           cd molecule/default/setup
-          docker-compose up -d
+          STACK_VERSION=${{ matrix.version }} docker-compose up -d
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
-        run: molecule test
+        run: STACK_VERSION=${{ matrix.version }} molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

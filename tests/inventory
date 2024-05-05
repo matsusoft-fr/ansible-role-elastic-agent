@@ -5,13 +5,15 @@ localvm1
 elastic_agent_download_filename=elastic-agent-{{ elastic_agent_version }}-{{ ansible_system | lower }}-arm64.tar.gz
 
 # Enroll
-# FIXME: test & update this inventory
-elastic_agent_enrollment_fleet_server_url=https://localvm4:8220
+# elastic_agent_standalone_elasticsearch_urls=
+# elastic_agent_enrollment_fleet_server_url=https://localvm4:8220
+# elastic_agent_enrollment_token=to_be_defined
 
 # Standalone
-# elastic_agent_ssl_certificate_authorities=[ '/etc/ssl/matsusoft/ca.pem' ]
-# elastic_agent_standalone_elasticsearch_urls= [ 'https://localvm1:9200' ]
-# elastic_agent_standalone_api_key=TBD
+elastic_agent_enrollment_fleet_server_url=''
+elastic_agent_enrollment_es_urls_for_tests=https://localvm1:9200
+elastic_agent_ssl_certificate_authorities=[ '/etc/ssl/matsusoft/ca.pem' ]
+elastic_agent_standalone_elasticsearch_urls= [ 'https://localvm1:9200' ]
 
 # Fleet Server
 # TODO

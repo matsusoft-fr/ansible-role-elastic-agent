@@ -2,8 +2,8 @@
 driver:
   name: docker
 platforms:
-  - name: instance-ubuntu
-    image: 'antmelekhin/docker-systemd:ubuntu-22.04'
+  - name: instance-${MOLECULE_DISTRO:-ubuntu-22.04}
+    image: "antmelekhin/docker-systemd:${MOLECULE_DISTRO:-ubuntu-22.04}"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - /var/lib/containerd
@@ -17,9 +17,10 @@ provisioner:
   inventory:
     group_vars:
       all:
+        elastic_agent_version: "{{ lookup('ansible.builtin.env', 'STACK_VERSION') }}"
         elastic_agent_standalone_elasticsearch_urls:
           - https://es01:9200
-        elastic_agent_verification_hostname: instance-ubuntu
+        elastic_agent_verification_hostname: instance-${MOLECULE_DISTRO:-ubuntu-22.04}
         elastic_agent_standalone_api_key: "{{ lookup('file', '/tmp/molecule/\
           api_key_molecule-automatic-test-' + lookup('ansible.builtin.env', \
           'MOLECULE_SCENARIO_NAME')) }}"

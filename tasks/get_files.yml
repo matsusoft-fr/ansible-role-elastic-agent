@@ -32,3 +32,4 @@
   ansible.builtin.file:
     path: "{{ elastic_agent_installation_tmpdir }}/{{ elastic_agent_download_filename }}"
     state: absent
+  tags: delete_install_files

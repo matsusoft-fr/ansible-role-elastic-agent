@@ -4,3 +4,25 @@
   become: true
   roles:
     - jpmat296.elastic_agent
+  pre_tasks:
+
+    # Standalone
+    - name: Create new API key from Elasticsearch
+      ansible.builtin.uri:
+        method: PUT
+        url: "{{ elastic_agent_enrollment_es_urls_for_tests }}/_security/api_key"
+        body:
+          name: molecule-automatic-test-{{ lookup('ansible.builtin.env', 'MOLECULE_SCENARIO_NAME') }}
+          expiration: 1h
+        body_format: json
+        url_username: elastic
+        url_password: "{{ lookup('community.general.onepassword', 'Elastic matsusoft') }}"
+        validate_certs: false
+      delegate_to: localhost
+      changed_when: true
+      register: api_key_result
+      when: elastic_agent_standalone_elasticsearch_urls | length > 0
+    - name: Set fact elastic_agent_standalone_api_key
+      ansible.builtin.set_fact:
+        elastic_agent_standalone_api_key: "{{ api_key_result.json.encoded | b64decode }}"
+      when: elastic_agent_standalone_elasticsearch_urls | length > 0

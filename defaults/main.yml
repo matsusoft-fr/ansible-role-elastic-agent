@@ -4,7 +4,7 @@ elastic_agent_user: root
 elastic_agent_group: root
 
 elastic_agent_version: 8.12.2
-elastic_agent_installation_tmpdir: "{{ elastic_agent_installation_dir }}/../tmp_install_ea"
+elastic_agent_installation_tmpdir: /opt/Elastic/tmp_install_ea
 elastic_agent_download_filename: "elastic-agent-{{ elastic_agent_version }}-{{ ansible_system
   | lower }}-{{ ansible_architecture }}.tar.gz"
 elastic_agent_download_url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/\

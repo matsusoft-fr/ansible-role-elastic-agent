@@ -33,7 +33,9 @@ jobs:
     strategy:
       matrix:
         version:
-          - 8.7.0
+          - 8.7.0  # -- base-path not supported
+          - 8.10.4
+          - 8.11.0
           - 8.12.2
           - 8.13.3
         distro:

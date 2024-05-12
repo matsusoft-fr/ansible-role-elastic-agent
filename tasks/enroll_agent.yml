@@ -1,4 +1,9 @@
 ---
+- name: Check elastic_agent_base_path parameter
+  ansible.builtin.fail:
+    msg: Elastic Agent with version below 8.11 does not support customization of base path.
+  when: elastic_agent_version is version('8.11', '<') and
+        elastic_agent_base_path != '/opt'
 - name: Check if process elastic-agent exists already
   community.general.pids:
     name: elastic-agent
@@ -6,6 +11,7 @@
 - name: Install Elastic Agent managed by Fleet
   ansible.builtin.command: >
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      {{ base_path_option }}
       --force
       {{ non_interactive_option }}
       --insecure
@@ -15,6 +21,8 @@
   become_user: root
   vars:
     non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+    base_path_option: "{{ '--base-path ' + elastic_agent_base_path
+      if elastic_agent_version is version('8.11', '>=') else '' }}"
   no_log: true
   changed_when: true
   when: pids_of_ea.pids | length == 0

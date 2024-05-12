@@ -25,3 +25,4 @@ provisioner:
           api_key_molecule-automatic-test-' + lookup('ansible.builtin.env', \
           'MOLECULE_SCENARIO_NAME')) }}"
         elastic_agent_ssl_verification_mode: none
+        elastic_agent_base_path: /opt_test

@@ -1,8 +1,8 @@
 ---
 name: CI
 'on':
-  pull_request:
-  push:
+  # pull_request:
+  # push:
 
 jobs:
 
@@ -53,6 +53,12 @@ jobs:
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
+
+      - name: Print versions
+        run: |
+          ansible --version
+          molecule --version
+          pip3 list | grep -E "ansible|molecule|pip"
 
       - name: Run Molecule tests.
         run: STACK_VERSION=${{ matrix.version }} molecule test

@@ -58,6 +58,6 @@
   changed_when: true
   when: not stat_result_target.stat.exists
 - name: Ensure Elastic Agent is started
-  ansible.builtin.systemd_service:
+  systemd:
     state: started
     name: elastic-agent

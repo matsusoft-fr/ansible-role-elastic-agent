@@ -1,4 +1,7 @@
 ---
+#
+# Common parameters (EA managed by Fleet, EA Standalone, Fleet Server)
+#
 elastic_agent_base_path: /opt
 elastic_agent_user: root
 elastic_agent_group: root
@@ -14,16 +17,33 @@ elastic_agent_download_url: "https://artifacts.elastic.co/downloads/beats/elasti
   {{ elastic_agent_download_filename }}"
 elastic_agent_ssl_certificate_authorities: []
 elastic_agent_ssl_verification_mode: ''
-
-elastic_agent_enrollment_fleet_server_url: ''
-
-# elastic_agent_policy is ignored if elastic_agent_enrollment_token is defined
-elastic_agent_enrollment_token: ''
-elastic_agent_policy: "policy-{{ ansible_host }}"
-
-elastic_agent_standalone_api_key: ''
-elastic_agent_standalone_elasticsearch_urls:
-  - https://localhost:9200
+elastic_agent_insecure: false
 
 # Not mandatory to uninstall Elastic Agent
 elastic_agent_uninstall_token: ''
+
+#
+# EA Fleet Server parameters
+#
+fleet_server_url: ''
+fleet_server_elasticsearch_url: ''
+fleet_server_policy: 'fleet-server-policy'
+fleet_server_token: ''  # Cannot be set manually.
+
+# user / password are required for policy management or fleet server token creation
+fleet_server_elasticsearch_user: elastic
+fleet_server_elasticsearch_password: ''
+
+#
+# EA managed by Fleet parameters
+#
+elastic_agent_enrollment_fleet_server_url: ''
+elastic_agent_enrollment_token: ''
+# elastic_agent_policy is ignored if elastic_agent_enrollment_token is defined
+elastic_agent_policy: "policy-{{ ansible_host }}"
+
+#
+# EA standalone parameters
+#
+elastic_agent_standalone_elasticsearch_urls: []
+elastic_agent_standalone_api_key: ''

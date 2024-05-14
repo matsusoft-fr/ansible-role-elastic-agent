@@ -10,6 +10,24 @@
   ansible.builtin.import_tasks: sa_configuration.yml
   when: elastic_agent_standalone_elasticsearch_urls | length > 0
 
+- name: Create fleet-server-policy
+  ansible.builtin.import_tasks: fleet_server_policy.yml
+  when: fleet_server_url | length > 0
+
+- name: Install + Enroll Fleet Server
+  ansible.builtin.import_tasks: fleet_server.yml
+  when: fleet_server_url | length > 0
+
+- name: Fail if no option is chosen
+  ansible.builtin.fail:
+    msg: >-
+      A non-empty value is required for either elastic_agent_enrollment_fleet_server_url or
+      elastic_agent_standalone_elasticsearch_urls or fleet_server_url
+  when: >
+    elastic_agent_enrollment_fleet_server_url == '' and
+    elastic_agent_standalone_elasticsearch_urls | length == 0 and
+    fleet_server_url == ''
+
 - name: Uninstall Elastic Agent
   ansible.builtin.import_tasks: uninstall_agent.yml
   tags:

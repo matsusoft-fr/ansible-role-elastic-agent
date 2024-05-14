@@ -1,0 +1,46 @@
+---
+- name: Check if fleet-server-policy exists
+  ansible.builtin.uri:
+    method: GET
+    url: http://localhost:5601/api/fleet/agent_policies/fleet-server-policy
+    headers:
+      kbn-xsrf: true
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  failed_when: false
+  register: check_policy_result
+- name: Create new fleet-server-policy
+  ansible.builtin.uri:
+    method: POST
+    url: http://localhost:5601/api/fleet/agent_policies?sys_monitoring=true
+    headers:
+      kbn-xsrf: true
+    src: files/fleet_policy_new.json
+    body_format: json
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  when: check_policy_result.status == 404
+  changed_when: true
+- name: Add Fleet package integration
+  ansible.builtin.uri:
+    method: POST
+    url: http://localhost:5601/api/fleet/package_policies
+    headers:
+      kbn-xsrf: true
+    src: files/fleet_policy_integration2.json
+    body_format: json
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  register: add_integration_result
+  when: >
+    check_policy_result.status == 404 or
+    (check_policy_result.status == 200 and
+     check_policy_result.json.item.package_policies | length < 2)
+  changed_when: true
+...

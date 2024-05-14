@@ -1,0 +1,39 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Set fleet_server_hosts
+      ansible.builtin.uri:
+        method: PUT
+        url: http://localhost:5601/api/fleet/settings
+        headers:
+          kbn-xsrf: true
+        body:
+          fleet_server_hosts:
+            - "{{ fleet_server_url }}"
+        body_format: json
+        user: "{{ fleet_server_elasticsearch_user }}"
+        password: "{{ fleet_server_elasticsearch_password }}"
+        force_basic_auth: true
+      delegate_to: localhost
+      changed_when: true
+    - name: Set fleet-default-output
+      ansible.builtin.uri:
+        method: PUT
+        url: http://localhost:5601/api/fleet/outputs/fleet-default-output
+        headers:
+          kbn-xsrf: true
+        body:
+          name: default
+          is_default: true
+          is_default_monitoring: true
+          type: elasticsearch
+          hosts:
+            - https://grampa:9200
+        body_format: json
+        user: "{{ fleet_server_elasticsearch_user }}"
+        password: "{{ fleet_server_elasticsearch_password }}"
+        force_basic_auth: true
+      delegate_to: localhost
+      changed_when: true

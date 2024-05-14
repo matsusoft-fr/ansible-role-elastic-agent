@@ -1,0 +1,74 @@
+---
+- name: Check if Fleet Server is already configured
+  ansible.builtin.wait_for:
+    port: 8220  # Let's suppose it is always 8220
+    timeout: 1
+  ignore_errors: true
+  register: wait_for_fleet_server
+- name: Set fact fleet_server_configured
+  ansible.builtin.set_fact:
+    fleet_server_configured: "{{ not wait_for_fleet_server.failed }}"
+- name: Delete Fleet Server token if exists
+  ansible.builtin.uri:
+    url: https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token
+    method: DELETE
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+    ca_path: "{{ elastic_agent_ssl_certificate_authorities[0] | default(omit) }}"
+  when: not fleet_server_configured
+  delegate_to: localhost
+  failed_when: delete_fleet_server_token.status != 200 and delete_fleet_server_token.status != 404
+  changed_when: delete_fleet_server_token.json.found == true
+  register: delete_fleet_server_token
+- name: Create new Fleet Server token
+  ansible.builtin.uri:
+    url: "https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token"
+    method: POST
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+    ca_path: "{{ elastic_agent_ssl_certificate_authorities[0] | default(omit) }}"
+  delegate_to: localhost
+  changed_when: >
+    create_fleet_server_token.json.error is undefined or
+    (not create_fleet_server_token.json.error.type == 'version_conflict_engine_exception')
+  failed_when: create_fleet_server_token.status != 200
+  register: create_fleet_server_token
+  when: not fleet_server_configured
+- name: Fail if Fleet Server token already exists
+  ansible.builtin.fail:
+    msg: >-
+      Fleet Server token already exists but Fleet Server seems not running. To force install of a new
+      Fleet Server, you can delete existing token with Dev Tools command:
+      DELETE /_security/service/elastic/fleet-server/credential/token/token
+  when: not fleet_server_configured and create_fleet_server_token.failed
+- name: Set fact fleet_server_token
+  ansible.builtin.set_fact:
+    fleet_server_token: "{{ create_fleet_server_token.json.token.value }}"
+  when: not fleet_server_configured
+- name: Install Fleet Server
+  ansible.builtin.command: >
+    {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      --force
+      {{ non_interactive_option }}
+      --fleet-server-es={{ fleet_server_elasticsearch_url }}
+      --fleet-server-service-token={{ fleet_server_token }}
+      --fleet-server-policy={{ fleet_server_policy }}
+      --fleet-server-port=8220
+      {{ fleet_server_es_ca_option }}
+      {{ fleet_server_insecure_option }}
+  no_log: true
+  vars:
+    fleet_server_es_ca_option: "{{ '--fleet-server-es-ca ' +
+      elastic_agent_ssl_certificate_authorities[0]
+      if elastic_agent_ssl_certificate_authorities | length > 0 else '' }}"
+    fleet_server_insecure_option: "{{ '--fleet-server-es-insecure --insecure' if elastic_agent_insecure else '' }}"
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+  changed_when: true
+  when: not fleet_server_configured
+- name: Wait Fleet Server startup
+  ansible.builtin.wait_for:
+    port: 8220  # Let's suppose it is always 8220
+    timeout: 60
+...

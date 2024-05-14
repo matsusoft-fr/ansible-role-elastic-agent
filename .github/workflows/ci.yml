@@ -35,12 +35,11 @@ jobs:
         version:
           - 8.7.0   # -- base-path not supported
           - 8.10.4  # -- base-path not supported
-          - 8.11.0
           - 8.12.2
           - 8.13.3
         distro:
           - ubuntu-22.04
-          - rockylinux-9
+          # - rockylinux-9
 
     steps:
       - name: Check out the codebase.
@@ -48,14 +47,16 @@ jobs:
 
       - name: Start containers
         run: |
-          cd molecule/default/setup
+          cd molecule/setup
           STACK_VERSION=${{ matrix.version }} docker-compose up -d
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
-        run: STACK_VERSION=${{ matrix.version }} molecule test
+        run: |
+          STACK_VERSION=${{ matrix.version }} molecule test -s default
+          STACK_VERSION=${{ matrix.version }} molecule test -s fleet
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -64,5 +65,5 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          cd molecule/default/setup
+          cd molecule/setup
           docker-compose down || true

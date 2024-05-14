@@ -1,0 +1,69 @@
+---
+- name: Check if Fleet Server is already configured
+  ansible.builtin.wait_for:
+    port: 8220  # Let's suppose it is always 8220
+    timeout: 1
+  ignore_errors: true
+  register: wait_for_fleet_server
+- name: Set fact fleet_server_configured
+  ansible.builtin.set_fact:
+    fleet_server_configured: "{{ not wait_for_fleet_server.failed }}"
+- name: Create new Fleet Server token
+  ansible.builtin.uri:
+    url: "https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token"
+    method: POST
+    user: elastic
+    password: "{{ es_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    # ca_path: "{{ elastic_agent_ssl_certificate_authorities[0] }}"
+  delegate_to: localhost
+  changed_when: >
+    create_fleet_server_token.json.error is undefined or
+    (not create_fleet_server_token.json.error.type == 'version_conflict_engine_exception')
+  ignore_errors: true
+  register: create_fleet_server_token
+  when: not fleet_server_configured
+- name: Fail if Fleet Server token already exists
+  ansible.builtin.fail:
+    msg: >-
+      Fleet Server token already exists but Fleet Server seems not running. To force install of a new
+      Fleet Server, you can delete existing token with Dev Tools command:
+      DELETE /_security/service/elastic/fleet-server/credential/token/token
+  when: not fleet_server_configured and create_fleet_server_token.failed
+- name: Set fact fleet_server_token
+  ansible.builtin.set_fact:
+    fleet_server_token: "{{ create_fleet_server_token.json.token.value }}"
+  when: not fleet_server_configured
+  # --fleet-server-es-ca={{ elastic_agent_ssl_certificate_authorities[0] }}
+- name: DEBUG COMMAND
+  ansible.builtin.debug:
+    msg: >
+      {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+        --force
+        {{ non_interactive_option }}
+        --fleet-server-es={{ fleet_elasticsearch_url }}
+        --fleet-server-service-token={{ fleet_server_token }}
+        --fleet-server-policy={{ fleet_server_policy }}
+        --fleet-server-es-insecure
+        --insecure
+        --fleet-server-port=8220
+  vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+- name: Install Fleet Server
+  ansible.builtin.command: >
+    {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      --force
+      {{ non_interactive_option }}
+      --fleet-server-es={{ fleet_elasticsearch_url }}
+      --fleet-server-service-token={{ fleet_server_token }}
+      --fleet-server-policy={{ fleet_server_policy }}
+      --fleet-server-es-insecure
+      --insecure
+      --fleet-server-port=8220
+  # no_log: true
+  vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+  changed_when: true
+  when: not fleet_server_configured
+...

@@ -5,8 +5,8 @@
     url: http://localhost:5601/api/fleet/agent_policies/fleet-server-policy
     headers:
       kbn-xsrf: true
-    user: elastic
-    password: "{{ es_password }}"
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
     force_basic_auth: true
   delegate_to: localhost
   failed_when: false
@@ -19,8 +19,8 @@
       kbn-xsrf: true
     src: files/fleet_policy_new.json
     body_format: json
-    user: elastic
-    password: "{{ es_password }}"
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
     force_basic_auth: true
   delegate_to: localhost
   when: check_policy_result.status == 404
@@ -33,8 +33,8 @@
       kbn-xsrf: true
     src: files/fleet_policy_integration2.json
     body_format: json
-    user: elastic
-    password: "{{ es_password }}"
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
     force_basic_auth: true
   delegate_to: localhost
   register: add_integration_result

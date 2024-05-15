@@ -12,8 +12,8 @@
         url: http://localhost:5601/api/fleet/agents
         headers:
           kbn-xsrf: true
-        user: elastic
-        password: "{{ es_password }}"
+        user: "{{ fleet_server_elasticsearch_user }}"
+        password: "{{ fleet_server_elasticsearch_password }}"
         force_basic_auth: true
       delegate_to: localhost
       failed_when: false

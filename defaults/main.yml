@@ -25,9 +25,13 @@ elastic_agent_uninstall_token: ''
 # EA Fleet Server parameters
 #
 fleet_server_url: ''
-fleet_elasticsearch_url: ''
+fleet_server_elasticsearch_url: ''
 fleet_server_policy: 'fleet-server-policy'
 fleet_server_token: ''  # FIXME: test when given manually
+
+# user / password are required for policy management or fleet server token creation
+fleet_server_elasticsearch_user: elastic
+fleet_server_elasticsearch_password: ''
 
 #
 # EA managed by Fleet parameters

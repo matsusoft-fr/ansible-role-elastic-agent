@@ -12,8 +12,8 @@
   ansible.builtin.uri:
     url: "https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token"
     method: POST
-    user: elastic
-    password: "{{ es_password }}"
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
     force_basic_auth: true
     validate_certs: false
     # ca_path: "{{ elastic_agent_ssl_certificate_authorities[0] }}"
@@ -42,7 +42,7 @@
       {{ elastic_agent_installation_tmpdir }}/elastic-agent install
         --force
         {{ non_interactive_option }}
-        --fleet-server-es={{ fleet_elasticsearch_url }}
+        --fleet-server-es={{ fleet_server_elasticsearch_url }}
         --fleet-server-service-token={{ fleet_server_token }}
         --fleet-server-policy={{ fleet_server_policy }}
         --fleet-server-es-insecure
@@ -55,7 +55,7 @@
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install
       --force
       {{ non_interactive_option }}
-      --fleet-server-es={{ fleet_elasticsearch_url }}
+      --fleet-server-es={{ fleet_server_elasticsearch_url }}
       --fleet-server-service-token={{ fleet_server_token }}
       --fleet-server-policy={{ fleet_server_policy }}
       --fleet-server-es-insecure

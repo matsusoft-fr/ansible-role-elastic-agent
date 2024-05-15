@@ -10,6 +10,10 @@
   ansible.builtin.import_tasks: sa_configuration.yml
   when: elastic_agent_standalone_elasticsearch_urls | length > 0
 
+- name: Create fleet-server-policy
+  ansible.builtin.import_tasks: fleet_server_policy.yml
+  when: fleet_server_url | length > 0
+
 - name: Install + Enroll Fleet Server
   ansible.builtin.import_tasks: fleet_server.yml
   when: fleet_server_url | length > 0

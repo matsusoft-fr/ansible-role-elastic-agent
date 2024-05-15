@@ -1,0 +1,31 @@
+{
+  "name": "fleet_server-1",
+  "namespace": "default",
+  "package": {
+    "name": "fleet_server",
+    "title": "Fleet Server",
+    "version": "1.5.0"
+  },
+  "enabled": true,
+  "policy_id": "fleet-server-policy",
+  "inputs": [
+    {
+      "type": "fleet-server",
+      "policy_template": "fleet_server",
+      "enabled": true,
+      "streams": [],
+      "vars": {
+        "max_agents": {
+          "type": "integer"
+        },
+        "max_connections": {
+          "type": "integer"
+        },
+        "custom": {
+          "value": "",
+          "type": "yaml"
+        }
+      }
+    }
+  ]
+}

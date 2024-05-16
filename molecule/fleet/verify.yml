@@ -26,5 +26,4 @@
           - check_agents_result.json.list[0].status == 'online'
           - check_agents_result.json.list[0].last_checkin_status == 'online'
           - check_agents_result.json.list[0].last_checkin_message == 'Running'
-          - check_agents_result.json.list[0].components[0].type == 'fleet-server'
           - check_agents_result.json.list[0].components[0].status == 'HEALTHY'

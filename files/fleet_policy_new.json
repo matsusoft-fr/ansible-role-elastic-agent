@@ -9,6 +9,5 @@
     ],
     "is_default_fleet_server": true,
     "inactivity_timeout": 1209600,
-    "is_managed": false,
-    "is_protected": false
+    "is_managed": false
 }

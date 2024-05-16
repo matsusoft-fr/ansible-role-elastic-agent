@@ -54,7 +54,9 @@ jobs:
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
-        run: STACK_VERSION=${{ matrix.version }} molecule test -s fleet
+        run: |
+          STACK_VERSION=${{ matrix.version }} molecule test -s default
+          STACK_VERSION=${{ matrix.version }} molecule test -s fleet
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

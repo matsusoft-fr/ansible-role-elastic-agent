@@ -47,7 +47,7 @@ jobs:
 
       - name: Start containers
         run: |
-          cd molecule/default/setup
+          cd molecule/setup
           STACK_VERSION=${{ matrix.version }} docker-compose up -d
 
       - name: Install test dependencies.
@@ -65,5 +65,5 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          cd molecule/default/setup
+          cd molecule/setup
           docker-compose down || true

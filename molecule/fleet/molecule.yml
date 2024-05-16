@@ -18,6 +18,8 @@ provisioner:
     group_vars:
       all:
         elastic_agent_version: "{{ lookup('ansible.builtin.env', 'STACK_VERSION') }}"
+        elastic_agent_ssl_certificate_authorities:
+          - "{{ lookup('ansible.builtin.env', 'MOLECULE_SCENARIO_DIRECTORY') }}/../setup/certs/ca/ca.crt"
         fleet_server_url: https://instance-${MOLECULE_DISTRO:-ubuntu-22.04}:8220
         fleet_server_elasticsearch_url: https://es01:9200
         elastic_agent_verification_hostname: instance-${MOLECULE_DISTRO:-ubuntu-22.04}

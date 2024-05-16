@@ -8,6 +8,19 @@
 - name: Set fact fleet_server_configured
   ansible.builtin.set_fact:
     fleet_server_configured: "{{ not wait_for_fleet_server.failed }}"
+- name: Delete Fleet Server token if exists
+  ansible.builtin.uri:
+    url: https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token
+    method: DELETE
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+    validate_certs: false  # FIXME
+  when: not fleet_server_configured
+  delegate_to: localhost
+  ignore_errors: true
+  changed_when: delete_fleet_server_token.json.found == true
+  register: delete_fleet_server_token
 - name: Create new Fleet Server token
   ansible.builtin.uri:
     url: "https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token"

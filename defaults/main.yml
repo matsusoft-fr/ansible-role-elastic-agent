@@ -17,6 +17,7 @@ elastic_agent_download_url: "https://artifacts.elastic.co/downloads/beats/elasti
   {{ elastic_agent_download_filename }}"
 elastic_agent_ssl_certificate_authorities: []
 elastic_agent_ssl_verification_mode: ''
+elastic_agent_insecure: false
 
 # Not mandatory to uninstall Elastic Agent
 elastic_agent_uninstall_token: ''
@@ -28,7 +29,6 @@ fleet_server_url: ''
 fleet_server_elasticsearch_url: ''
 fleet_server_policy: 'fleet-server-policy'
 fleet_server_token: ''  # Cannot be set manually.
-fleet_server_insecure: false
 
 # user / password are required for policy management or fleet server token creation
 fleet_server_elasticsearch_user: elastic

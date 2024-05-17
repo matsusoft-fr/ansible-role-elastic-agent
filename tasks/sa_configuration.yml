@@ -47,7 +47,6 @@
       {{ base_path_option }}
       --force
       {{ non_interactive_option }}
-      --insecure
   become: true
   become_user: root
   vars:

@@ -12,3 +12,7 @@
       # unable to get local issuer certificate (_ssl.c:1007)>
       # "url": "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.7.0-linux-x86_64.tar.gz
       validate_certs: false
+    ansible.builtin.uri:
+      # Disable certificate validation only for the tests to avoid complexity of
+      # self-signed certificates
+      validate_certs: false

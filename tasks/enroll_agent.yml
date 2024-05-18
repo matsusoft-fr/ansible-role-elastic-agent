@@ -30,6 +30,22 @@
   ansible.builtin.set_fact:
     elastic_agent_enrollment_token: "{{ out.json.list[0].api_key }}"
   when: elastic_agent_enrollment_token | length == 0
+- name: DEBUG
+  ansible.builtin.debug:
+    msg: >
+      {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+        {{ base_path_option }}
+        --force
+        {{ non_interactive_option }}
+        --url={{ elastic_agent_enrollment_fleet_server_url }}
+        --enrollment-token={{ elastic_agent_enrollment_token }}
+        {{ fleet_server_insecure_option }}
+  vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+    base_path_option: "{{ '--base-path ' + elastic_agent_base_path
+      if elastic_agent_version is version('8.11', '>=') else '' }}"
+    fleet_server_insecure_option: "{{ '--insecure' if elastic_agent_insecure else '' }}"
+  when: pids_of_ea.pids | length == 0
 - name: Install Elastic Agent managed by Fleet
   ansible.builtin.command: >
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install
@@ -46,7 +62,7 @@
     base_path_option: "{{ '--base-path ' + elastic_agent_base_path
       if elastic_agent_version is version('8.11', '>=') else '' }}"
     fleet_server_insecure_option: "{{ '--insecure' if elastic_agent_insecure else '' }}"
-  no_log: false
+  no_log: true
   changed_when: true
   when: pids_of_ea.pids | length == 0
 - name: Delete tmp installation dir of Elastic Agent

@@ -1,5 +1,5 @@
 ---
-name: Elastic Agent enrollment molecule scenario
+name: EA enrollment scenario
 'on':
   pull_request:
   push:

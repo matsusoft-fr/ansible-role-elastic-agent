@@ -7,8 +7,8 @@
       when: ansible_distribution == 'Ubuntu'
       block:
         - name: Convert hostname to local IPv4
-          ansible.builtin.shell: "set -o pipefail && getent hosts {{ fleet_server_url | \
-            urlsplit(\"hostname\") }} | awk '{ print $1 }'"
+          ansible.builtin.shell: "getent hosts {{ fleet_server_url | \
+            urlsplit(\"hostname\") }} | awk '{ print $1 }'"  # noqa: risky-shell-pipe
           changed_when: false
           register: getent_result
         - name: Use IPv4 in fleet_server_url

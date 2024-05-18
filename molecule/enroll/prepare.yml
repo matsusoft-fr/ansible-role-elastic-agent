@@ -1,0 +1,11 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Update apt packages list
+      ansible.builtin.apt:
+        update_cache: true
+    - name: Install misc packages required
+      ansible.builtin.package:
+        name: python3-psutil

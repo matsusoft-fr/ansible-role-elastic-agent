@@ -2,6 +2,13 @@
 - name: Prepare Elastic agent files
   ansible.builtin.import_tasks: get_files.yml
 
+- name: Create fleet-default-policy
+  ansible.builtin.import_tasks: fleet_default_policy.yml
+  when: >
+    elastic_agent_enrollment_fleet_server_url | length > 0 and
+    elastic_agent_policy == 'fleet-default-policy' and
+    elastic_agent_enrollment_token | length == 0
+
 - name: Install + Enroll Elastic Agent
   ansible.builtin.import_tasks: enroll_agent.yml
   when: elastic_agent_enrollment_fleet_server_url | length > 0

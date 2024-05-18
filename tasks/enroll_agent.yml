@@ -4,10 +4,32 @@
     msg: Elastic Agent with version below 8.11 does not support customization of base path.
   when: elastic_agent_version is version('8.11', '<') and
         elastic_agent_base_path != '/opt'
-- name: Check if process elastic-agent exists already
+- name: Check if process elastic-agent is running
   community.general.pids:
     name: elastic-agent
   register: pids_of_ea
+- name: Get existing elastic_agent_enrollment_token
+  ansible.builtin.uri:
+    # KQL filter is active : true and policy_id : "{{ elastic_agent_policy }}"
+    url: "https://localhost:5601/api/fleet/enrollment-api-keys?\
+      kuery=active%20%3A%20true%20and%20policy_id%20%3A%20%22{{ elastic_agent_policy }}%22"
+    headers:
+      kbn-xsrf: true
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  changed_when: false
+  when: elastic_agent_enrollment_token | length == 0
+  register: out
+- name: No token found for elastic_agent_policy
+  ansible.builtin.fail:
+    msg: No active enrollment token found for policy {{ elastic_agent_policy }}
+  when: elastic_agent_enrollment_token | length == 0 and out.json.list | length == 0
+- name: Get existing elastic_agent_enrollment_token - set fact
+  ansible.builtin.set_fact:
+    elastic_agent_enrollment_token: "{{ out.json.list[0].api_key }}"
+  when: elastic_agent_enrollment_token | length == 0
 - name: Install Elastic Agent managed by Fleet
   ansible.builtin.command: >
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install

@@ -1,0 +1,31 @@
+---
+- name: Check if fleet-default-policy exists
+  ansible.builtin.uri:
+    method: GET
+    url: https://localhost:5601/api/fleet/agent_policies/fleet-default-policy
+    headers:
+      kbn-xsrf: true
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  failed_when: check_policy_result.status != 404 and check_policy_result.status != 200
+  register: check_policy_result
+- name: Create new fleet-default-policy
+  ansible.builtin.uri:
+    method: POST
+    url: https://localhost:5601/api/fleet/agent_policies
+    headers:
+      kbn-xsrf: true
+    body:  # Is the minimal policy
+      id: fleet-default-policy
+      name: fleet-default-policy
+      namespace: default
+    body_format: json
+    user: "{{ fleet_server_elasticsearch_user }}"
+    password: "{{ fleet_server_elasticsearch_password }}"
+    force_basic_auth: true
+  delegate_to: localhost
+  when: check_policy_result.status == 404
+  changed_when: true
+...

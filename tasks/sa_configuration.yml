@@ -59,3 +59,8 @@
   ansible.builtin.systemd_service:
     state: started
     name: elastic-agent
+- name: Delete tmp installation dir of Elastic Agent
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}"
+    state: absent
+  tags: delete_install_files

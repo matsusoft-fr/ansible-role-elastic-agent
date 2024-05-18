@@ -72,4 +72,8 @@
     non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
   changed_when: true
   when: not fleet_server_configured
-...
+- name: Delete tmp installation dir of Elastic Agent
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}"
+    state: absent
+  tags: delete_install_files

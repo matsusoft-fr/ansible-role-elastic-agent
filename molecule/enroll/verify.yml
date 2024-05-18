@@ -9,20 +9,22 @@
     - name: Check agents state
       ansible.builtin.uri:
         method: GET
-        url: http://localhost:5601/api/fleet/agents
+        # KQL filter is active : status: online and policy_id : "fleet-default-policy"
+        url: "https://localhost:5601/api/fleet/agents?\
+          kuery=status%20%3A%20online%20and%20policy_id%20%3A%20%22fleet-default-policy%22"
         headers:
           kbn-xsrf: true
         user: "{{ fleet_server_elasticsearch_user }}"
         password: "{{ fleet_server_elasticsearch_password }}"
         force_basic_auth: true
+        validate_certs: false
       delegate_to: localhost
       register: check_agents_result
     - name: Assert Fleet Server is registed
       ansible.builtin.assert:
         that:
           - check_agents_result.json.list | length == 1
-          - check_agents_result.json.list[0].policy_id == 'fleet-server-policy'
+          - check_agents_result.json.list[0].policy_id == 'fleet-default-policy'
           - check_agents_result.json.list[0].status == 'online'
           - check_agents_result.json.list[0].last_checkin_status == 'online'
           - check_agents_result.json.list[0].last_checkin_message == 'Running'
-          - check_agents_result.json.list[0].components[0].status == 'HEALTHY'

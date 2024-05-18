@@ -1,4 +1,9 @@
 ---
+- name: Check elastic_agent_base_path parameter
+  ansible.builtin.fail:
+    msg: Elastic Agent with version below 8.11 does not support customization of base path.
+  when: elastic_agent_version is version('8.11', '<') and
+        elastic_agent_base_path != '/opt'
 - name: Check if Fleet Server is already configured
   ansible.builtin.wait_for:
     port: 8220  # Let's suppose it is always 8220

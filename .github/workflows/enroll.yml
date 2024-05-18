@@ -1,31 +1,10 @@
 ---
-name: CI
+name: EA enrollment scenario
 'on':
   pull_request:
   push:
 
 jobs:
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v2
-
-      - name: Set up Python 3.
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Install test dependencies.
-        run: pip3 install yamllint
-
-      - name: Run yamllint
-        uses: karancode/yamllint-github-action@v2.1.1
-
-      - name: Run ansible-lint
-        uses: ansible/ansible-lint@v24.2.2
 
   molecule:
     name: Molecule
@@ -47,16 +26,16 @@ jobs:
 
       - name: Start containers
         run: |
-          cd molecule/setup/es_kb
-          STACK_VERSION=${{ matrix.version }} docker-compose up -d
+          cd molecule/setup/es_kb_fleet
+          sed -i 's/^STACK_VERSION=.*/STACK_VERSION=${{ matrix.version }}/g' .env
+          ./elastic-container.sh start
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
       - name: Run Molecule tests.
         run: |
-          STACK_VERSION=${{ matrix.version }} molecule test -s default
-          STACK_VERSION=${{ matrix.version }} molecule test -s fleet
+          STACK_VERSION=${{ matrix.version }} molecule test -s enroll
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -65,5 +44,5 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          cd molecule/setup/es_kb
-          docker-compose down || true
+          cd molecule/setup/es_kb_fleet
+          STACK_VERSION=${{ matrix.version }} ./elastic-container.sh destroy

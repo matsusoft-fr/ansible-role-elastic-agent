@@ -40,7 +40,7 @@ fleet_server_elasticsearch_password: ''
 elastic_agent_enrollment_fleet_server_url: ''
 elastic_agent_enrollment_token: ''
 # elastic_agent_policy is ignored if elastic_agent_enrollment_token is defined
-elastic_agent_policy: "policy-{{ ansible_host }}"
+elastic_agent_policy: 'fleet-default-policy'
 
 #
 # EA standalone parameters

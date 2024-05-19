@@ -10,7 +10,7 @@
       ansible.builtin.uri:
         method: GET
         # KQL filter is active : status: online and policy_id : "fleet-default-policy"
-        url: "https://localhost:5601/api/fleet/agents?\
+        url: "{{ elastic_agent_kibana_host }}/api/fleet/agents?\
           kuery=status%20%3A%20online%20and%20policy_id%20%3A%20%22fleet-default-policy%22"
         headers:
           kbn-xsrf: true

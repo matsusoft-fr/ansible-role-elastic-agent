@@ -5,6 +5,7 @@
 elastic_agent_base_path: /opt
 elastic_agent_user: root
 elastic_agent_group: root
+elastic_agent_kibana_host: http://kibana:5601  # Not used for standalone
 
 # Cannot be changed. It is fixed by Elastic Agent installer
 elastic_agent_installation_dir: "{{ elastic_agent_base_path }}/Elastic/Agent"

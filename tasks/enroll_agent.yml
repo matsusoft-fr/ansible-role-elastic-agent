@@ -11,7 +11,7 @@
 - name: Get existing elastic_agent_enrollment_token
   ansible.builtin.uri:
     # KQL filter is active : true and policy_id : "{{ elastic_agent_policy }}"
-    url: "https://localhost:5601/api/fleet/enrollment-api-keys?\
+    url: "{{ elastic_agent_kibana_host }}/api/fleet/enrollment-api-keys?\
       kuery=active%20%3A%20true%20and%20policy_id%20%3A%20%22{{ elastic_agent_policy }}%22"
     headers:
       kbn-xsrf: true

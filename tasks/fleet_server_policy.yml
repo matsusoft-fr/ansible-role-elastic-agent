@@ -2,7 +2,7 @@
 - name: Check if fleet-server-policy exists
   ansible.builtin.uri:
     method: GET
-    url: http://localhost:5601/api/fleet/agent_policies/fleet-server-policy
+    url: "{{ elastic_agent_kibana_host }}/api/fleet/agent_policies/fleet-server-policy"
     headers:
       kbn-xsrf: true
     user: "{{ fleet_server_elasticsearch_user }}"
@@ -14,7 +14,7 @@
 - name: Create new fleet-server-policy
   ansible.builtin.uri:
     method: POST
-    url: http://localhost:5601/api/fleet/agent_policies?sys_monitoring=true
+    url: "{{ elastic_agent_kibana_host }}/api/fleet/agent_policies?sys_monitoring=true"
     headers:
       kbn-xsrf: true
     src: files/fleet_policy_new.json
@@ -28,7 +28,7 @@
 - name: Add Fleet package integration
   ansible.builtin.uri:
     method: POST
-    url: http://localhost:5601/api/fleet/package_policies
+    url: "{{ elastic_agent_kibana_host }}/api/fleet/package_policies"
     headers:
       kbn-xsrf: true
     src: files/fleet_policy_integration2.json

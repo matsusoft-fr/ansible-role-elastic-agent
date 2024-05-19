@@ -76,4 +76,9 @@
   ansible.builtin.wait_for:
     port: 8220  # Let's suppose it is always 8220
     timeout: 60
+- name: Delete tmp installation dir of Elastic Agent
+  ansible.builtin.file:
+    path: "{{ elastic_agent_installation_tmpdir }}"
+    state: absent
+  tags: delete_install_files
 ...

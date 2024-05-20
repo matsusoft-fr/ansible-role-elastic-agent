@@ -36,6 +36,7 @@ jobs:
       - name: Run Molecule tests.
         run: |
           STACK_VERSION=${{ matrix.version }} molecule test -s enroll
+          STACK_VERSION=${{ matrix.version }} molecule test -s uninstall
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

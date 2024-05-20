@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Wait 200 secs for Elastic Agent warmup
+      ansible.builtin.pause:
+    - name: Get file stats after uninstall
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      with_items:
+        - /etc/systemd/system/elastic-agent.service
+        - /opt/Elastic/Agent/
+        - /usr/bin/elastic-agent
+      register: stat_after_uninstall
+    - name: Assert file / dir exists no more after uninstall
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists == false
+      with_items: "{{ stat_after_uninstall.results }}"
+    - name: Check process elastic-agent
+      community.general.pids:
+        name: elastic-agent
+      register: pids_of_ea
+    - name: Assert no process elastic-agent
+      ansible.builtin.assert:
+        that:
+          - pids_of_ea.pids | length == 0
+    - name: Shell locate elastic-agent
+      ansible.builtin.shell: |
+        updatedb
+        locate elastic-agent
+      failed_when: locate_results.rc != 0 and locate_results.rc != 1
+      changed_when: false
+      register: locate_results
+    - name: Assert no elastic-agent file exists
+      ansible.builtin.assert:
+        that:
+          - locate_results.stdout_lines | length == 0

@@ -1,5 +1,5 @@
 ---
-name: EA enrollment scenario
+name: Scenarios with ES + KB + Fleet
 'on':
   pull_request:
   push:

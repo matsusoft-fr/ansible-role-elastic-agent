@@ -1,0 +1,23 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Update apt packages list
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_distribution == 'Ubuntu'
+    - name: Install misc packages required (Ubuntu)
+      ansible.builtin.package:
+        name: "{{ item }}"
+      with_items:
+        - python3-psutil
+        - locate
+      when: ansible_distribution == 'Ubuntu'
+    - name: Install misc packages required (Rocky Linux)
+      ansible.builtin.package:
+        name: "{{ item }}"
+      with_items:
+        - python3-psutil
+        - mlocate
+      when: ansible_distribution == 'Rocky'

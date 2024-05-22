@@ -48,6 +48,7 @@
 - name: Install Fleet Server
   ansible.builtin.command: >
     {{ elastic_agent_installation_tmpdir }}/elastic-agent install
+      {{ base_path_option }}
       --force
       {{ non_interactive_option }}
       --fleet-server-es={{ fleet_server_elasticsearch_url }}
@@ -58,11 +59,13 @@
       {{ fleet_server_insecure_option }}
   no_log: true
   vars:
+    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
+    base_path_option: "{{ '--base-path ' + elastic_agent_base_path
+      if elastic_agent_version is version('8.11', '>=') else '' }}"
     fleet_server_es_ca_option: "{{ '--fleet-server-es-ca ' +
       elastic_agent_ssl_certificate_authorities[0]
       if elastic_agent_ssl_certificate_authorities | length > 0 else '' }}"
     fleet_server_insecure_option: "{{ '--fleet-server-es-insecure --insecure' if elastic_agent_insecure else '' }}"
-    non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
   changed_when: true
   when: not fleet_server_configured
 - name: Wait Fleet Server startup

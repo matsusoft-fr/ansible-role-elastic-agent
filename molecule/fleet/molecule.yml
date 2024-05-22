@@ -23,7 +23,7 @@ provisioner:
         elastic_agent_kibana_host: http://localhost:5601
         elastic_agent_insecure: true
         fleet_server_url: https://instance-${MOLECULE_DISTRO:-ubuntu-22.04}:8220
-        fleet_server_elasticsearch_url: https://es01:9200
+        fleet_server_elasticsearch_url: https://localhost:9200
         elastic_agent_verification_hostname: instance-${MOLECULE_DISTRO:-ubuntu-22.04}
         fleet_server_for_cluster_es_url: https://instance-${MOLECULE_DISTRO:-ubuntu-22.04}:9200
         fleet_server_elasticsearch_user: elastic

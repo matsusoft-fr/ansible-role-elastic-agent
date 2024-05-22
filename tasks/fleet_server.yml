@@ -41,13 +41,6 @@
   failed_when: create_fleet_server_token.status != 200
   register: create_fleet_server_token
   when: not fleet_server_configured
-- name: Fail if Fleet Server token already exists
-  ansible.builtin.fail:
-    msg: >-
-      Fleet Server token already exists but Fleet Server seems not running. To force install of a new
-      Fleet Server, you can delete existing token with Dev Tools command:
-      DELETE /_security/service/elastic/fleet-server/credential/token/token
-  when: not fleet_server_configured and create_fleet_server_token.failed
 - name: Set fact fleet_server_token
   ansible.builtin.set_fact:
     fleet_server_token: "{{ create_fleet_server_token.json.token.value }}"

@@ -15,7 +15,7 @@
     fleet_server_configured: "{{ not wait_for_fleet_server.failed }}"
 - name: Delete Fleet Server token if exists
   ansible.builtin.uri:
-    url: https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token
+    url: "{{ fleet_server_elasticsearch_url }}/_security/service/elastic/fleet-server/credential/token/token"
     method: DELETE
     user: "{{ fleet_server_elasticsearch_user }}"
     password: "{{ fleet_server_elasticsearch_password }}"
@@ -28,7 +28,7 @@
   register: delete_fleet_server_token
 - name: Create new Fleet Server token
   ansible.builtin.uri:
-    url: "https://localhost:9200/_security/service/elastic/fleet-server/credential/token/token"
+    url: "{{ fleet_server_elasticsearch_url }}/_security/service/elastic/fleet-server/credential/token/token"
     method: POST
     user: "{{ fleet_server_elasticsearch_user }}"
     password: "{{ fleet_server_elasticsearch_password }}"

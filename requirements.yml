@@ -1,3 +1,5 @@
 ---
 collections:
   - community.general
+  - name: community.docker
+    version: '>=3.10.3'

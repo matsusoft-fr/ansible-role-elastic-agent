@@ -42,7 +42,7 @@
           is_default_monitoring: true
           type: elasticsearch
           hosts:
-            - https://grampa:9200
+            - https://es01:9200
         body_format: json
         user: "{{ fleet_server_elasticsearch_user }}"
         password: "{{ fleet_server_elasticsearch_password }}"

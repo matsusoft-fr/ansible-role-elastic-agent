@@ -33,6 +33,10 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install ansible molecule 'molecule-plugins[docker]'
 
+      - name: Add es01 to /etc/hosts
+        run: |
+            sudo echo "127.0.0.1 es01" | sudo tee -a /etc/hosts
+
       - name: Run Molecule tests.
         run: |
           STACK_VERSION=${{ matrix.version }} molecule test -s enroll

@@ -17,7 +17,7 @@
     - name: Set fleet_server_hosts
       ansible.builtin.uri:
         method: PUT
-        url: "{{ elastic_agent_kibana_host }}/api/fleet/settings"
+        url: "{{ elastic_agent_kibana_url }}/api/fleet/settings"
         headers:
           kbn-xsrf: true
         body:
@@ -33,7 +33,7 @@
     - name: Set fleet-default-output
       ansible.builtin.uri:
         method: PUT
-        url: "{{ elastic_agent_kibana_host }}/api/fleet/outputs/fleet-default-output"
+        url: "{{ elastic_agent_kibana_url }}/api/fleet/outputs/fleet-default-output"
         headers:
           kbn-xsrf: true
         body:

@@ -7,7 +7,7 @@
       Please remove character '/' at end of url {{ lookup('ansible.builtin.vars', item) }} from
       parameter {{ item }}.
   loop:
-    - elastic_agent_kibana_host
+    - elastic_agent_kibana_url
     - fleet_server_url
     - fleet_server_elasticsearch_url
     - elastic_agent_enrollment_fleet_server_url

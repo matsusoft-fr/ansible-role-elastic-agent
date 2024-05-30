@@ -20,7 +20,7 @@ provisioner:
     group_vars:
       all:
         elastic_agent_version: "{{ lookup('ansible.builtin.env', 'STACK_VERSION') }}"
-        elastic_agent_kibana_host: http://localhost:5601
+        elastic_agent_kibana_url: http://localhost:5601
         elastic_agent_insecure: true
         fleet_server_url: https://instance-${MOLECULE_DISTRO:-ubuntu-22.04}:8220
         fleet_server_elasticsearch_url: https://es01:9200

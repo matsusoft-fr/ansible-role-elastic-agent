@@ -2,7 +2,7 @@
 - name: Check if fleet-default-policy exists
   ansible.builtin.uri:
     method: GET
-    url: "{{ elastic_agent_kibana_host }}/api/fleet/agent_policies/fleet-default-policy"
+    url: "{{ elastic_agent_kibana_url }}/api/fleet/agent_policies/fleet-default-policy"
     headers:
       kbn-xsrf: true
     user: "{{ fleet_server_elasticsearch_user }}"
@@ -14,7 +14,7 @@
 - name: Create new fleet-default-policy
   ansible.builtin.uri:
     method: POST
-    url: "{{ elastic_agent_kibana_host }}/api/fleet/agent_policies"
+    url: "{{ elastic_agent_kibana_url }}/api/fleet/agent_policies"
     headers:
       kbn-xsrf: true
     body:  # Is the minimal policy

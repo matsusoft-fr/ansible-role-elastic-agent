@@ -9,7 +9,7 @@
     - name: Check agents state
       ansible.builtin.uri:
         method: GET
-        url: "{{ elastic_agent_kibana_host }}/api/fleet/agents"
+        url: "{{ elastic_agent_kibana_url }}/api/fleet/agents"
         headers:
           kbn-xsrf: true
         user: "{{ fleet_server_elasticsearch_user }}"

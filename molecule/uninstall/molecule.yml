@@ -17,7 +17,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        # No parameter required
+      # No parameter required
 scenario:
   test_sequence:  # All default steps except idempotence
     - dependency

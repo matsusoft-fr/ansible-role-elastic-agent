@@ -21,6 +21,12 @@ jobs:
           - rockylinux-9
 
     steps:
+      - name: Print hostname
+        run: |
+          hostname
+          hostname -f
+          echo $HOSTNAME
+
       - name: Check out the codebase.
         uses: actions/checkout@v2
 

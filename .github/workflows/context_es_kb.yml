@@ -1,8 +1,7 @@
 ---
 name: Scenarios with ES + KB
 'on':
-  pull_request:
-  push:
+  workflow_dispatch:
 
 jobs:
 

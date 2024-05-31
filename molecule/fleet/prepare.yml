@@ -3,6 +3,9 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: TMP
+      ansible.builtin.debug:
+        var: fleet_server_url
     - name: Set fleet_server_hosts
       ansible.builtin.uri:
         method: PUT

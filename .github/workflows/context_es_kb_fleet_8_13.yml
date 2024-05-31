@@ -1,5 +1,5 @@
 ---
-name: Scenarios with ES + KB + Fleet
+name: 8_13 Scenarios with ES + KB + Fleet
 'on':
   pull_request:
   push:
@@ -12,10 +12,11 @@ jobs:
     strategy:
       matrix:
         version:
-          - 8.7.0   # -- base-path not supported
-          - 8.10.4  # -- base-path not supported
-          - 8.12.2
-          - 8.14.2
+          # - 8.7.0   # -- base-path not supported
+          # - 8.10.4  # -- base-path not supported
+          # - 8.12.2
+          - 8.13.1
+          - 8.13.4
         distro:
           - ubuntu-22.04
           # - rockylinux-9
@@ -77,7 +78,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: my-artifact-${{ matrix.distro }}-${{ matrix.version }}
+          name: my-artifact-8_13-${{ matrix.distro }}-${{ matrix.version }}
           path: |
             ~/logs
 

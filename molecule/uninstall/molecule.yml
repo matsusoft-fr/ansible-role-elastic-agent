@@ -14,8 +14,11 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  options:
+    D: true
   env:
     ANSIBLE_RUN_TAGS: wipe_elastic_agent
+    ANSIBLE_VERBOSITY: 3
   inventory:
     group_vars:
       all:

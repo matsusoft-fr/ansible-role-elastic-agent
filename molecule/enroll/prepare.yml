@@ -3,6 +3,25 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: DEBUG GET Fleet server hosts
+      ansible.builtin.uri:
+        method: GET
+        url: https://localhost:5601/api/fleet/settings
+        headers:
+          kbn-xsrf: true
+        user: elastic
+        password: change_me
+        force_basic_auth: true
+        validate_certs: false
+      delegate_to: localhost
+      register: fleet_settings_json
+    - name: DEBUG value of fleet_server_hosts
+      ansible.builtin.debug:
+        var: fleet_settings_json.json.item.fleet_server_hosts
+    - name: DEBUG Assert value of fleet_server_hosts
+      ansible.builtin.assert:
+        that:
+          - fleet_settings_json.json.item.fleet_server_hosts | length > 0
     - name: Update apt packages list
       ansible.builtin.apt:
         update_cache: true

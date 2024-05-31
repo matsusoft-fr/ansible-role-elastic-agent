@@ -20,7 +20,44 @@
         validate_certs: false
       delegate_to: localhost
       register: check_agents_result
-    - name: Assert Fleet Server is registed
+    - name: DEBUG check_agents_result
+      ansible.builtin.debug:
+        var: check_agents_result
+    - name: DEBUG 1 - Check agents state 2
+      ansible.builtin.debug:
+        msg: "url is {{ elastic_agent_kibana_url }}/api/fleet/agents"
+      delegate_to: localhost
+    - name: DEBUG 2 - Check agents state 2
+      ansible.builtin.debug:
+        msg: "url is {{ elastic_agent_kibana_url }}/api/fleet/agents"
+    - name: Check agents state 2
+      ansible.builtin.uri:
+        method: GET
+        url: "{{ elastic_agent_kibana_url }}/api/fleet/agents"
+        headers:
+          kbn-xsrf: true
+        user: "{{ fleet_server_elasticsearch_user }}"
+        password: "{{ fleet_server_elasticsearch_password }}"
+        force_basic_auth: true
+        validate_certs: false
+      delegate_to: localhost
+      register: check_agents_result2
+    - name: DEBUG check_agents_result2
+      ansible.builtin.debug:
+        var: check_agents_result2
+    - name: DEBUG Fleet server hosts
+      ansible.builtin.uri:
+        method: GET
+        url: "{{ elastic_agent_kibana_url }}/api/fleet/settings"
+        headers:
+          kbn-xsrf: true
+        user: "{{ fleet_server_elasticsearch_user }}"
+        password: "{{ fleet_server_elasticsearch_password }}"
+        force_basic_auth: true
+        validate_certs: false
+      delegate_to: localhost
+      register: fleet_settings_json
+    - name: Assert new Elastic Agent is registed
       ansible.builtin.assert:
         that:
           - check_agents_result.json.list | length == 1

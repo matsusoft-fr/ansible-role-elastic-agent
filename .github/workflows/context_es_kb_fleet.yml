@@ -24,6 +24,11 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
 
+      - name: DEBUG - BEFORE
+        run: |
+          hostname
+          export
+
       - name: Start containers
         run: |
           cd molecule/setup/es_kb_fleet
@@ -35,12 +40,42 @@ jobs:
 
       - name: Run Molecule tests.
         run: |
-          STACK_VERSION=${{ matrix.version }} molecule test -s enroll
-          STACK_VERSION=${{ matrix.version }} molecule test -s uninstall
+          STACK_VERSION=${{ matrix.version }} molecule -vvv test -s enroll --destroy never
+          STACK_VERSION=${{ matrix.version }} molecule test -s uninstall --destroy never
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: DEBUG - STATE
+        if: always()
+        run: |
+          docker ps -all
+          docker exec instance-${{ matrix.distro }} ps -fC elastic-agent
+          docker exec instance-${{ matrix.distro }} find /opt/Elastic/Agent -iname "*.log" -o -iname "*.ndjson"
+          docker exec instance-${{ matrix.distro }} systemctl status elastic-agent
+          docker exec instance-${{ matrix.distro }} ls -l /opt/Elastic/Agent/data
+          docker exec instance-${{ matrix.distro }} ls -lrt /opt/Elastic/Agent/data/elastic-agent-8.14.1-1348b9/logs
+
+      - name: DEBUG - Docker
+        if: always()
+        run: |
+          mkdir -p ~/logs
+          docker inspect ecp-fleet-server > ~/logs/docker-inspect-ecp-fleet-server
+
+      - name: DEBUG - Copy before updload
+        if: always()
+        run: |
+          mkdir -p ~/logs
+          docker cp 'instance-${{ matrix.distro }}:/opt/Elastic/Agent/data/elastic-agent-8.14.1-1348b9/logs' ~/logs/
+          sudo chmod -R 777 ~/logs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: my-artifact
+          path: |
+            ~/logs
 
       - name: Stop containers
         if: always()

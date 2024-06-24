@@ -57,7 +57,7 @@
       --fleet-server-port=8220
       {{ fleet_server_es_ca_option }}
       {{ fleet_server_insecure_option }}
-  no_log: true
+  # no_log: true
   vars:
     non_interactive_option: "{{ '--non-interactive' if elastic_agent_version is version('8.3', '>=') else '' }}"
     base_path_option: "{{ '--base-path ' + elastic_agent_base_path

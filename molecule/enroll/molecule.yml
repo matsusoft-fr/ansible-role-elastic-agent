@@ -7,6 +7,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - /var/lib/containerd
+      - es_kb_fleet_certs:/certs:z
     networks:
       - name: elasticsearch_cluster
     cgroupns_mode: host
@@ -19,9 +20,10 @@ provisioner:
   inventory:
     group_vars:
       all:
+        elastic_agent_ssl_certificate_authorities:
+          - /certs/ca/ca.crt
         elastic_agent_version: "{{ lookup('ansible.builtin.env', 'STACK_VERSION') }}"
         elastic_agent_kibana_url: https://{{ lookup("pipe", "hostname") }}:5601
-        elastic_agent_insecure: true
         elastic_agent_enrollment_fleet_server_url: https://{{ lookup("pipe", "hostname") }}:8220
         fleet_server_elasticsearch_user: elastic
         fleet_server_elasticsearch_password: change_me

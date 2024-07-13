@@ -21,14 +21,14 @@
   delegate_to: localhost
   changed_when: false
   when: elastic_agent_enrollment_token | length == 0
-  register: out
+  register: get_token
 - name: No token found for elastic_agent_policy
   ansible.builtin.fail:
     msg: No active enrollment token found for policy {{ elastic_agent_policy }}
-  when: elastic_agent_enrollment_token | length == 0 and out.json.list | length == 0
+  when: elastic_agent_enrollment_token | length == 0 and get_token.json.list | length == 0
 - name: Get existing elastic_agent_enrollment_token - set fact
   ansible.builtin.set_fact:
-    elastic_agent_enrollment_token: "{{ out.json.list[0].api_key }}"
+    elastic_agent_enrollment_token: "{{ get_token.json.list[0].api_key }}"
   when: elastic_agent_enrollment_token | length == 0
 - name: Install Elastic Agent managed by Fleet
   ansible.builtin.command: >
@@ -39,6 +39,8 @@
       --url={{ elastic_agent_enrollment_fleet_server_url }}
       --enrollment-token={{ elastic_agent_enrollment_token }}
       {{ fleet_server_insecure_option }}
+      {{ certificate_authorities_option }}
+      {{ fleet_server_es_ca_option }}
   become: true
   become_user: root
   vars:
@@ -46,6 +48,10 @@
     base_path_option: "{{ '--base-path ' + elastic_agent_base_path
       if elastic_agent_version is version('8.11', '>=') else '' }}"
     fleet_server_insecure_option: "{{ '--insecure' if elastic_agent_insecure else '' }}"
+    certificate_authorities_option: "{{ '--certificate-authorities ' + elastic_agent_ssl_certificate_authorities[0]
+      if elastic_agent_ssl_certificate_authorities | length > 0 else '' }}"
+    fleet_server_es_ca_option: "{{ '--fleet-server-es-ca ' + elastic_agent_ssl_certificate_authorities[0]
+      if elastic_agent_ssl_certificate_authorities | length > 0 else '' }}"
   no_log: true
   changed_when: true
   when: pids_of_ea.pids | length == 0

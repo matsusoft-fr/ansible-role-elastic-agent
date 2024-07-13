@@ -21,7 +21,7 @@ provisioner:
       all:
         elastic_agent_version: "{{ lookup('ansible.builtin.env', 'STACK_VERSION') }}"
         elastic_agent_standalone_elasticsearch_urls:
-          - https://es01:9200
+          - https://{{ lookup("pipe", "hostname") }}:9200
         elastic_agent_verification_hostname: instance-${MOLECULE_DISTRO:-ubuntu-22.04}
         elastic_agent_standalone_api_key: "{{ lookup('file', '/tmp/molecule/\
           api_key_molecule-automatic-test-' + lookup('ansible.builtin.env', \

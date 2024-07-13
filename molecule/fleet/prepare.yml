@@ -3,17 +3,6 @@
   hosts: all
   gather_facts: true
   tasks:
-    - name: Workaround Kibana "Invalid URL" error for ubuntu hostname instance-ubuntu-xx.yy
-      when: ansible_distribution == 'Ubuntu'
-      block:
-        - name: Convert hostname to local IPv4
-          ansible.builtin.shell: "getent hosts {{ fleet_server_url | \
-            urlsplit(\"hostname\") }} | awk '{ print $1 }'"  # noqa: risky-shell-pipe
-          changed_when: false
-          register: getent_result
-        - name: Use IPv4 in fleet_server_url
-          ansible.builtin.set_fact:
-            fleet_server_url: https://{{ getent_result.stdout_lines[0] }}:8220
     - name: Set fleet_server_hosts
       ansible.builtin.uri:
         method: PUT
@@ -42,7 +31,7 @@
           is_default_monitoring: true
           type: elasticsearch
           hosts:
-            - https://es01:9200
+            - https://{{ lookup("pipe", "hostname") }}:9200
         body_format: json
         user: "{{ fleet_server_elasticsearch_user }}"
         password: "{{ fleet_server_elasticsearch_password }}"

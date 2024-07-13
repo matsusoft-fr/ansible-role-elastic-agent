@@ -15,7 +15,7 @@ jobs:
           - 8.7.0   # -- base-path not supported
           - 8.10.4  # -- base-path not supported
           - 8.12.2
-          - 8.13.3
+          - 8.14.2
         distro:
           - ubuntu-22.04
           - rockylinux-9
